@@ -46,7 +46,7 @@ logger.addHandler(q_handler)
 logging.getLogger("uvicorn.error").addHandler(q_handler)
 logging.getLogger("uvicorn.access").addHandler(q_handler)
 
-app = FastAPI(title="Luffy Panel", docs_url=None, redoc_url=None)
+app = FastAPI(title="Iman Panel", docs_url=None, redoc_url=None)
 
 CONFIG = {
     "port": int(os.environ.get("PORT", 8000)),
@@ -385,7 +385,7 @@ def get_domain() -> str:
         .replace("https://", "").replace("http://", "")
     )
 
-def generate_vless_link(uuid: str, remark: str = "Luffy", address: str = None, port: int = None) -> str:
+def generate_vless_link(uuid: str, remark: str = "Iman", address: str = None, port: int = None) -> str:
     domain = get_domain()
     addr = address if address else domain
     use_port = port if port else DEFAULT_PORT
@@ -776,7 +776,7 @@ async def handle_create_command(text: str):
         }
 
     save_db()
-    vless_link = generate_vless_link(uid, remark=f"Luffy-{label}", port=DEFAULT_PORT)
+    vless_link = generate_vless_link(uid, remark=f"ImanPanel-{label}", port=DEFAULT_PORT)
     sub_url = f"https://{get_domain()}/sub/{uid}"
 
     quota_str = _fmt_bytes(limit_bytes) if limit_bytes > 0 else L("unlimited")
@@ -875,7 +875,7 @@ async def telegram_notifier_cron():
 # ── Routes ────────────────────────────────────────────────────────────────────
 @app.get("/")
 async def root():
-    # NOTE: this used to return {"service": "Luffy Panel", ...} — a plaintext
+    # NOTE: this used to return {"service": "Iman Panel", ...} — a plaintext
     # admission that this server is a proxy panel, visible to anyone who simply
     # curls the domain. Active-probing/DPI systems check exactly this kind of
     # thing. Return something generic instead.
@@ -1006,7 +1006,7 @@ async def create_link(request: Request, _=Depends(require_auth)):
         "uuid": uid, "label": label, "limit_bytes": limit_bytes, "used_bytes": 0,
         "max_connections": max_conn, "active": True, "created_at": LINKS[uid]["created_at"],
         "expires_at": expires_at,
-        "vless_link": generate_vless_link(uid, remark=f"Luffy-{label}", port=DEFAULT_PORT),
+        "vless_link": generate_vless_link(uid, remark=f"ImanPanel-{label}", port=DEFAULT_PORT),
     }
 
 @app.get("/api/links")
@@ -1025,7 +1025,7 @@ async def list_links(_=Depends(require_auth)):
             "created_at": data["created_at"],
             "expires_at": data.get("expires_at"),
             "current_connections": await count_connections_for_link(uid),
-            "vless_link": generate_vless_link(uid, remark=f"Luffy-{data['label']}", port=DEFAULT_PORT),
+            "vless_link": generate_vless_link(uid, remark=f"ImanPanel-{data['label']}", port=DEFAULT_PORT),
         })
     result.sort(key=lambda x: x["created_at"], reverse=True)
     return {"links": result}
@@ -1157,9 +1157,9 @@ def generate_landing_page(link: dict, uid: str, addresses: list[str]) -> str:
         hours = (secs_left % 86400) // 3600
         expiry_str = f"{days} Days, {hours} Hours Left"
 
-    configs = [generate_vless_link(uid, remark=f"Luffy-{link['label']}", port=DEFAULT_PORT)]
+    configs = [generate_vless_link(uid, remark=f"💥ImanPanel-{link['label']}-Pro", port=DEFAULT_PORT)]
     for i, addr in enumerate(addresses):
-        configs.append(generate_vless_link(uid, remark=f"Luffy-{link['label']}-IP{i+1}", address=addr, port=DEFAULT_PORT))
+        configs.append(generate_vless_link(uid, remark=f"⚡ImanPanel-{link['label']}-Server{i+1}", address=addr, port=DEFAULT_PORT))
 
     configs_json = json.dumps(configs)
     
@@ -1397,9 +1397,9 @@ def generate_subscription_content(link: dict, uid: str, addresses: list[str]) ->
     status_node = generate_vless_link(uid, remark=f"📊 {usage_str} | ⏳ {expiry_str}", address="0.0.0.0", port=DEFAULT_PORT)
     links_out = [status_node]
     
-    links_out.append(generate_vless_link(uid, remark=f"Luffy-{link['label']}", port=DEFAULT_PORT))
+    links_out.append(generate_vless_link(uid, remark=f"💥ImanPanel-{link['label']}-Pro", port=DEFAULT_PORT))
     for i, addr in enumerate(addresses):
-        links_out.append(generate_vless_link(uid, remark=f"Luffy-{link['label']}-IP{i+1}", address=addr, port=DEFAULT_PORT))
+        links_out.append(generate_vless_link(uid, remark=f"⚡ImanPanel-{link['label']}-Server{i+1}", address=addr, port=DEFAULT_PORT))
             
     return "\n".join(links_out)
 
@@ -1693,7 +1693,7 @@ PANEL_HTML = r"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title data-en="Luffy Panel" data-fa="LUFFY PANEL">Luffy Panel</title>
+<title data-en="Iman Panel" data-fa="Iman PANEL">Iman Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@300;400;500;600;700&family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -1948,7 +1948,7 @@ body[dir="rtl"]{direction:rtl;text-align:right}
           <ellipse cx="42" cy="17" rx="23" ry="5.5" fill="#C8900A" stroke="#FFD700" stroke-width="1"/>
           <path d="M20 45 Q21.5 41.5 42 39.5 Q62.5 41.5 64 45" fill="none" stroke="#CC2200" stroke-width="4.5" stroke-linecap="round" opacity=".92"/>
         </svg>
-        <div class="login-title">LUFFY PANEL</div>
+        <div class="login-title">IMAN PANEL</div>
         <div class="login-sub">Enter your password to continue</div>
       </div>
       <div class="fg">
@@ -1973,7 +1973,7 @@ body[dir="rtl"]{direction:rtl;text-align:right}
         <button class="lang-btn lang-fa" onclick="setLang('fa')">FA</button>
       </div>
     </div>
-    <span style="font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1px;">LUFFY</span>
+    <span style="font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--gold);letter-spacing:1px;">IMAN</span>
   </div>
 
   <!-- SIDEBAR -->
@@ -1989,7 +1989,7 @@ body[dir="rtl"]{direction:rtl;text-align:right}
           <ellipse cx="35" cy="24" rx="5" ry="3" fill="rgba(255,255,255,.1)" transform="rotate(-20 35 24)"/>
         </svg>
       </div>
-      <div class="sb-title">LUFFY</div>
+      <div class="sb-title">IMAN</div>
     </div>
     <nav class="sb-nav">
       <button class="nav-item active" data-page="dashboard">
